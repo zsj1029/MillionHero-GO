@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"os/exec"
 	"os"
-	"github.com/MillionHero/baidu"
-	. "github.com/MillionHero/utils"
+	"github.com/MillionHero-GO/baidu"
+	. "github.com/MillionHero-GO/utils"
 
 )
 
