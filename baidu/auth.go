@@ -19,8 +19,8 @@ type Token struct {
 	ErrDesc     string `json:"error_description"`
 	TS          int64
 }
-var filename = "c:/screenshot/token.txt"
 
+//获取百度token
 func GetAuth() (Token,error) {
 
 	var Token = Token{}
@@ -30,7 +30,7 @@ func GetAuth() (Token,error) {
 		return Token,nil
 	}
 
-	url := fmt.Sprintf(Token_url+"?grant_type=%s&client_id=%s&client_secret=%s",
+	url := fmt.Sprintf(TokenUrl+"?grant_type=%s&client_id=%s&client_secret=%s",
 		"client_credentials",ApiKey,SecretKey)
 
 	resp,err := http.Get(url)
@@ -52,22 +52,23 @@ func GetAuth() (Token,error) {
 
 	tokenText,err := json.Marshal(&Token)
 
-	ioutil.WriteFile(filename,tokenText,0666)
+	ioutil.WriteFile(TokenFile,tokenText,0666)
 
 	return Token,err
 }
 
+//文件加载token
 func LoadToken()  (Token,error){
 
 	var Token = &Token{}
 
-	_,err :=os.Stat(filename);
+	_,err :=os.Stat(TokenFile);
 	if err != nil {
-		file,err := os.Create(filename)
+		file,err := os.Create(TokenFile)
 		defer file.Close()
 		return *Token,err
 	}
-	tokenText,_ := ioutil.ReadFile(filename)
+	tokenText,_ := ioutil.ReadFile(TokenFile)
 	json.Unmarshal([]byte(tokenText),Token)
 
 	if err != nil {
