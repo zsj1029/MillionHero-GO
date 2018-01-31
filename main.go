@@ -8,12 +8,10 @@ import (
 	"os"
 	"github.com/MillionHero-GO/baidu"
 	. "github.com/MillionHero-GO/utils"
-
 )
 
 func main() {
-	bt := time.Now().Unix()
-	fmt.Println(bt)
+
 
 	if runtime.GOOS != "windows" {
 		panic("程序只能运行在windows系统")
@@ -44,12 +42,16 @@ func main() {
 	for true  {
 		fmt.Print("按回车键开始识别问题...")
 		fmt.Scanf("%s", &quote)
-
-		//screen_img()//安卓截屏
+		start := float64(time.Now().UnixNano())
+		screen_img()//安卓截屏
 
 		cut_image()
 
 		get_image_text();
+		end := float64(time.Now().UnixNano())
+		//fmt.Printf("处理时间:%v",math.Ceil(end-start)/100000000)
+		useTime := (end-start)/1000000000
+		fmt.Printf("处理时间：%.3f秒\n",useTime)
 
 	}
 
