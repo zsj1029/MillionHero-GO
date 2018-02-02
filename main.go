@@ -8,11 +8,14 @@ import (
 	"os"
 	"github.com/MillionHero-GO/baidu"
 	. "github.com/MillionHero-GO/utils"
+	"strconv"
+	"image"
+	 _ "image/png"
+	"image/png"
 )
 
+
 func main() {
-
-
 	if runtime.GOOS != "windows" {
 		panic("程序只能运行在windows系统")
 	}
@@ -32,49 +35,64 @@ func main() {
 	fmt.Print(string(out))
 
 	//百度auth_token
-	token,err := baidu.GetAuth()
+	AccessToken,err := baidu.GetAuth()
 	HandleError(err)
 
-	fmt.Printf("%#v",token)
+	//fmt.Printf("%#v",AccessToken)
 
 
 	var quote string
+	var i = 1
 	for true  {
 		fmt.Print("按回车键开始识别问题...")
 		fmt.Scanf("%s", &quote)
 		start := float64(time.Now().UnixNano())
-		screen_img()//安卓截屏
 
-		cut_image()
+		//screenImg(i)//安卓截屏
+		cutImage(99)
+		getImageText(AccessToken)
 
-		get_image_text();
 		end := float64(time.Now().UnixNano())
-		//fmt.Printf("处理时间:%v",math.Ceil(end-start)/100000000)
 		useTime := (end-start)/1000000000
 		fmt.Printf("处理时间：%.3f秒\n",useTime)
-
+		i++
 	}
 
 }
 
-func screen_img()  {
+func screenImg(i int)  {
 	//截图
 	var cmd *exec.Cmd
 	cmd = exec.Command("cmd","/C","adb shell /system/bin/screencap -p /sdcard/screenshot.png")
 	err := cmd.Run()
 	HandleError(err)
 	//保存本地
-	cmd = exec.Command("cmd","/C","adb pull /sdcard/screenshot.png c:/screenshot/screenshot.png")
+	cmd = exec.Command("cmd","/C","adb pull /sdcard/screenshot.png c:/screenshot/screenshot"+strconv.Itoa(i)+".png")
 	err = cmd.Run()
 	HandleError(err)
 }
 
-func cut_image() {
+func cutImage(i int) {
+	path := "c:/screenshot/screenshot"+strconv.Itoa(i)+".png";
+	//打开图片
+	file, err := os.Open(path)
+	defer file.Close()
+	HandleError(err)
 
+	m, _, err := image.Decode(file)// 图片文件解码
+	HandleError(err)
+
+	//fmt.Printf("%v",m.ColorModel())
+	img := m.(*image.NRGBA)
+	newImg := img.SubImage(image.Rect(75,300, 1020,1220)).(*image.NRGBA)
+	imgfile, err := os.Create("c:/screenshot/screenshot_block.png")
+	defer imgfile.Close()
+	err = png.Encode(imgfile, newImg)
 }
 
-func get_image_text()  {
+func getImageText(AccessToken string)  {
 
-	baidu.GetAuth()
+	fmt.Println(AccessToken)
+
 }
 

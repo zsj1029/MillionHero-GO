@@ -21,13 +21,12 @@ type Token struct {
 }
 
 //获取百度token
-func GetAuth() (Token,error) {
+func GetAuth() (AccessToken string,err error) {
 
-	var Token = Token{}
 	//先从文件加载Token
 	Token,err := LoadToken()
 	if err == nil && Token.ExpiresIn > time.Now().Unix() {
-		return Token,nil
+		return Token.AccessToken,nil
 	}
 
 	url := fmt.Sprintf(TokenUrl+"?grant_type=%s&client_id=%s&client_secret=%s",
@@ -40,8 +39,8 @@ func GetAuth() (Token,error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	jsonStr := string(body)
-	fmt.Println("jsonStr", jsonStr)
+	//jsonStr := string(body)
+	//fmt.Println("jsonStr", jsonStr)
 	err = json.Unmarshal(body, &Token)
 
 	if err != nil {
@@ -54,7 +53,7 @@ func GetAuth() (Token,error) {
 
 	ioutil.WriteFile(TokenFile,tokenText,0666)
 
-	return Token,err
+	return Token.AccessToken,err
 }
 
 //文件加载token
