@@ -8,6 +8,7 @@ import (
 	"os"
 	"github.com/MillionHero-GO/baidu"
 	. "github.com/MillionHero-GO/utils"
+	. "github.com/MillionHero-GO/config"
 	"strconv"
 	"image"
 	 _ "image/png"
@@ -40,7 +41,6 @@ func main() {
 
 	//fmt.Printf("%#v",AccessToken)
 
-
 	var quote string
 	var i = 1
 	for true  {
@@ -50,11 +50,11 @@ func main() {
 
 		//screenImg(i)//安卓截屏
 		cutImage(99)
-		getImageText(AccessToken)
+		getAnswer(AccessToken)
 
 		end := float64(time.Now().UnixNano())
 		useTime := (end-start)/1000000000
-		fmt.Printf("处理时间：%.3f秒\n",useTime)
+		fmt.Printf("\n处理时间：%.3f秒\n",useTime)
 		i++
 	}
 
@@ -82,17 +82,16 @@ func cutImage(i int) {
 	m, _, err := image.Decode(file)// 图片文件解码
 	HandleError(err)
 
-	//fmt.Printf("%v",m.ColorModel())
 	img := m.(*image.NRGBA)
 	newImg := img.SubImage(image.Rect(75,300, 1020,1220)).(*image.NRGBA)
-	imgfile, err := os.Create("c:/screenshot/screenshot_block.png")
+	imgfile, err := os.Create(BlockImg)
 	defer imgfile.Close()
 	err = png.Encode(imgfile, newImg)
 }
 
-func getImageText(AccessToken string)  {
+func getAnswer(AccessToken string)  {
 
-	fmt.Println(AccessToken)
+	baidu.GetImageText(AccessToken)
 
 }
 
