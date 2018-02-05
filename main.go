@@ -20,9 +20,11 @@ func main() {
 	if runtime.GOOS != "windows" {
 		panic("程序只能运行在windows系统")
 	}
+
 	//创建临时目录
 	err := os.MkdirAll("c:/screenshot/", 0777)
 	HandleError(err)
+
 
 	//杀死adb相关进程
 	//var cmd *exec.Cmd
@@ -48,8 +50,8 @@ func main() {
 		fmt.Scanf("%s", &quote)
 		start := float64(time.Now().UnixNano())
 
-		//screenImg(i)//安卓截屏
-		cutImage(99)
+		screenImg(i)//安卓截屏
+		cutImage(i)
 		getAnswer(AccessToken)
 
 		end := float64(time.Now().UnixNano())
@@ -84,14 +86,19 @@ func cutImage(i int) {
 
 	img := m.(*image.NRGBA)
 	newImg := img.SubImage(image.Rect(75,300, 1020,1220)).(*image.NRGBA)
-	imgfile, err := os.Create(BlockImg)
-	defer imgfile.Close()
-	err = png.Encode(imgfile, newImg)
+	imgFile, err := os.Create(BlockImg)
+	defer imgFile.Close()
+	err = png.Encode(imgFile, newImg)
 }
 
 func getAnswer(AccessToken string)  {
 
-	baidu.GetImageText(AccessToken)
+	qaText := baidu.GetImageText(AccessToken)
+	qa := baidu.GetQA(&qaText)
+
+
+
+	baidu.SearchQ(qa)
 
 }
 

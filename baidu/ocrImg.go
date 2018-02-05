@@ -4,13 +4,13 @@ import (
 	"io/ioutil"
 	"encoding/base64"
 	. "github.com/MillionHero-GO/config"
-	"fmt"
 	"net/url"
 	"net/http"
 	"strings"
 	. "github.com/MillionHero-GO/utils"
 	"encoding/json"
 	"log"
+	"regexp"
 )
 
 type Image2Text struct {
@@ -30,7 +30,7 @@ type Words struct {
 	Words string `json:"words"`
 }
 
-func GetImageText(AccessToken string) bool {
+func GetImageText(AccessToken string) Image2Text {
 
 	byteImg, _ := ioutil.ReadFile(BlockImg)
 	//encode := make([]byte,500000)//byte初始化，encode base64后的图片
@@ -55,29 +55,32 @@ func GetImageText(AccessToken string) bool {
 
 	if ack.ErrorCode > 0 {
 		log.Println(ack.ErrorMsg)
-		return false
 	}
 	//fmt.Printf("%#v", text)
-	//解析问题和答案
-	GetQA(ack)
-	return true
+	return ack
 }
 
-func GetQA(ack Image2Text) {
+/**
+	问题区分答案处理
+ */
+func GetQA(ack *Image2Text) QA {
 
 	qa := QA{}
-	//if ack.WordsResultNum <= 4 {
-	//	qa.Question = ack.WordsResult[0].Words
-	//} else if ack.WordsResultNum == 5 {
-	//	qa.Question = ack.WordsResult[0].Words + ack.WordsResult[1].Words
-	//} else {
-	//	qa.Question = ack.WordsResult[0].Words + ack.WordsResult[1].Words + ack.WordsResult[2].Words
-	//}
-
-	for key, value := range ack.WordsResult {
-		newMap[key] = value
+	findQues := false
+	//ack.WordsResult[2].Words = "A："+ack.WordsResult[2].Words
+	re := regexp.MustCompile(`\w+[:|：]+`)
+	for _, value := range ack.WordsResult {
+		if findQues == false {
+			qa.Question += value.Words
+			findQues,_ = regexp.MatchString(`\?|？`,qa.Question)
+		}else {
+			value.Words = strings.Replace(value.Words,"《","",1)
+			value.Words = strings.Replace(value.Words,"》","",1)
+			value.Words = re.ReplaceAllString(value.Words,"")
+			//fmt.Println(value.Words)
+			qa.Answers = append(qa.Answers,value)
+		}
 	}
-
-	fmt.Println(qa)
+	return qa
 
 }
