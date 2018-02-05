@@ -97,7 +97,7 @@ func getAnswer(AccessToken string)  {
 	qaText := baidu.GetImageText(AccessToken)
 	qa := baidu.GetQA(&qaText)
 	baidu.SearchQ(&qa)
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~数量统计")
 	for _,value := range qa.Answers{
 		WaitGroup.Add(1)
 		go baidu.SearchQA(qa.Question,value.Words)

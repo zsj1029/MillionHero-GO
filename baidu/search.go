@@ -31,7 +31,7 @@ func SearchQ(qa *QA) {
 		fmt.Println("百科：" + strings.TrimSpace(baiKe))
 	}
 	//最佳答案
-	re = regexp.MustCompile(`[...].*`)//去除更多问题
+	re = regexp.MustCompile(`[更多关于].*`)//去除更多问题
 	doc.Find("#content_left .c-container .c-abstract").Each(func(i int, s *goquery.Selection) {
 		zuijia := strings.TrimSpace(s.Text())
 
@@ -43,7 +43,7 @@ func SearchQ(qa *QA) {
 	})
 
 	leftContent := doc.Find("#content_left").First().Text()
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~匹配统计")
 	for _,value := range qa.Answers{
 		countNum := strings.Count(leftContent,value.Words)
 		fmt.Printf("|%-10s|----> %d\n",value.Words, countNum)
