@@ -16,6 +16,7 @@ import (
 )
 
 
+
 func main() {
 	if runtime.GOOS != "windows" {
 		panic("程序只能运行在windows系统")
@@ -95,10 +96,12 @@ func getAnswer(AccessToken string)  {
 
 	qaText := baidu.GetImageText(AccessToken)
 	qa := baidu.GetQA(&qaText)
-
-
-
-	baidu.SearchQ(qa)
-
+	baidu.SearchQ(&qa)
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	for _,value := range qa.Answers{
+		WaitGroup.Add(1)
+		go baidu.SearchQA(qa.Question,value.Words)
+	}
+	WaitGroup.Wait()
 }
 

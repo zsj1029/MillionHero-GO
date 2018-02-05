@@ -7,10 +7,11 @@ import (
 	"regexp"
 	"net/url"
 	"strings"
+	. "github.com/MillionHero-GO/config"
 )
 
 //直接搜索问题处理返回值
-func SearchQ(qa QA) {
+func SearchQ(qa *QA) {
 	//start := float64(time.Now().UnixNano())
 	fmt.Println(qa.Question)
 
@@ -33,8 +34,9 @@ func SearchQ(qa QA) {
 	re = regexp.MustCompile(`[...].*`)//去除更多问题
 	doc.Find("#content_left .c-container .c-abstract").Each(func(i int, s *goquery.Selection) {
 		zuijia := strings.TrimSpace(s.Text())
-		zuijia = re.ReplaceAllString(zuijia,"")
+
 		if strings.Contains(zuijia,"最佳答案"){
+			zuijia = re.ReplaceAllString(zuijia,"")
 			fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 			fmt.Println(zuijia)
 		}
@@ -53,6 +55,17 @@ func SearchQ(qa QA) {
 
 
 //搜索问题加答案处理返回值
-func SearchQA(qa QA)  {
+func SearchQA(q string,a string)  {
+	doc, err := goquery.NewDocument("http://www.baidu.com/s?wd="+url.PathEscape(q+" "+a))
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	result := doc.Find(".nums").First().Text()
+	//re := regexp.MustCompile(`\d+[,]*`)//取出数字
+	//result = re.FindString(result)
+	strArr := strings.Split(result,"约")
+	fmt.Printf("|%-10s|----> %-10s\n",a,strArr[1])
+	//fmt.Println(strArr[1])
+	WaitGroup.Done()
 }
