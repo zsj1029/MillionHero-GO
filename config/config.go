@@ -15,3 +15,6 @@ const TokenFile = "c:/screenshot/token.txt"
 const BlockImg = "c:/screenshot/screenshot_block.png"
 
 var WaitGroup sync.WaitGroup
+
+var AttentionWord = []string{"是错", "错误", "没有", "不是", "不能", "不对", "不属于", "不可以", "不正确", "不提供", "不包含", "不包括", "不存在", "不经过", "不可能", "不匹配"}
+

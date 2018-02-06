@@ -8,18 +8,50 @@ import (
 	"net/url"
 	"strings"
 	. "github.com/MillionHero-GO/config"
+	"github.com/yanyiwu/gojieba"
+	"github.com/axgle/mahonia"
 )
+
+func Knowledge(qa *QA) {
+	question := qa.Question
+	//中文分词，提取关键词
+	var keywords []string
+	words := gojieba.NewJieba().Tag(question)
+	for _, v := range words {
+		if strings.Contains(v, "/n") {
+			keywords = append(keywords, strings.Split(v, "/")[0])
+		}
+	}
+	fmt.Println(strings.Join(keywords, " "));
+	//搜索题目
+	searchURL := fmt.Sprintf("https://zhidao.baidu.com/search?word=%s", url.QueryEscape(strings.Join(keywords, " ")))
+	doc, err := goquery.NewDocument(searchURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := doc.Find("#wgt-autoask")
+	t := s.Find("#wgt-autoask > dl > dt").Text()
+	d := s.Find("#wgt-autoask > dl > dd.dd.answer").Text()
+	dec := mahonia.NewDecoder("gbk")
+	t = dec.ConvertString(t)
+	d = dec.ConvertString(d)
+	//d = strings.Replace(d, "\n", "", -1)
+	//d = strings.Replace(d, "推荐答案", "", -1)
+	//d = strings.Replace(d, "[详细]", "", -1)
+	fmt.Printf("知识图谱推荐答案：%s%s\n", t, d)
+}
 
 //直接搜索问题处理返回值
 func SearchQ(qa *QA) {
-	//start := float64(time.Now().UnixNano())
 	fmt.Println(qa.Question)
+
 
 	re := regexp.MustCompile(`^\d+[.]{0,1}`)//去除序号
 	qa.Question = re.ReplaceAllString(qa.Question,"")
 	//qa.Question = "妯娌"
 	//fmt.Println("https://www.baidu.com/s?wd="+url.PathEscape(qa.Question))
-	doc, err := goquery.NewDocument("http://www.baidu.com/s?wd="+url.PathEscape(qa.Question))
+	doc, err := goquery.NewDocument("http://www.baidu.com/s?wd="+url.QueryEscape(qa.Question))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,21 +74,27 @@ func SearchQ(qa *QA) {
 		}
 	})
 
+	//for _, v := range AttentionWord {
+	//	if strings.Contains(qa.Question, v) {
+	//		fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	//		fmt.Printf("请注意题干：%s...\n", v)
+	//		break
+	//	}
+	//}
 	leftContent := doc.Find("#content_left").First().Text()
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~匹配统计")
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~匹配统计~~~~~~~~~~~~~~~~~~~~~")
 	for _,value := range qa.Answers{
 		countNum := strings.Count(leftContent,value.Words)
-		fmt.Printf("|%-10s|----> %d\n",value.Words, countNum)
+		//length := len(value.Words)
+		//fmt.Println(length)
+		fmt.Printf("%s\t---->\t%d\n",value.Words, countNum)
 	}
-	//end := float64(time.Now().UnixNano())
-	//useTime := (end-start)/1000000000
-	//fmt.Printf("\n搜索时间：%.3f秒\n",useTime)
 }
 
 
 //搜索问题加答案处理返回值
 func SearchQA(q string,a string)  {
-	doc, err := goquery.NewDocument("http://www.baidu.com/s?wd="+url.PathEscape(q+" "+a))
+	doc, err := goquery.NewDocument("http://www.baidu.com/s?wd="+url.QueryEscape(q+" "+a))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,7 +103,7 @@ func SearchQA(q string,a string)  {
 	//re := regexp.MustCompile(`\d+[,]*`)//取出数字
 	//result = re.FindString(result)
 	strArr := strings.Split(result,"约")
-	fmt.Printf("|%-10s|----> %-10s\n",a,strArr[1])
+	fmt.Printf("%s\t---->\t%s\n",a,strArr[1])
 	//fmt.Println(strArr[1])
 	WaitGroup.Done()
 }
