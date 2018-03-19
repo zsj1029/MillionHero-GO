@@ -2,8 +2,8 @@ package baidu
 
 import (
 	"fmt"
-	. "github.com/MillionHero-GO/config"
-	. "github.com/MillionHero-GO/utils"
+	. "github.com/zsj1029/MillionHero-GO/config"
+	. "github.com/zsj1029/MillionHero-GO/utils"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"

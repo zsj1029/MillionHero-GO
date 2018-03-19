@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"net/url"
 	"strings"
-	. "github.com/MillionHero-GO/config"
+	. "github.com/zsj1029/MillionHero-GO/config"
 	"github.com/yanyiwu/gojieba"
 	"github.com/axgle/mahonia"
 )

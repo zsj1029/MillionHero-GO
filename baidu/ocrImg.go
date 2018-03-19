@@ -3,11 +3,11 @@ package baidu
 import (
 	"io/ioutil"
 	"encoding/base64"
-	. "github.com/MillionHero-GO/config"
+	. "github.com/zsj1029/MillionHero-GO/config"
 	"net/url"
 	"net/http"
 	"strings"
-	. "github.com/MillionHero-GO/utils"
+	. "github.com/zsj1029/MillionHero-GO/utils"
 	"encoding/json"
 	"log"
 	"regexp"
@@ -45,8 +45,8 @@ func GetImageText(AccessToken string) Image2Text {
 
 	resp, err := http.Post(OcrApi, "application/x-www-form-urlencoded", strings.NewReader(params))
 
-	defer resp.Body.Close()
 	HandleError(err);
+	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	ack := Image2Text{}
 
